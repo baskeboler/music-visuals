@@ -14,38 +14,31 @@
  * =========================================================
  */
 
-public void slider1_change1(GSlider source, GEvent event) { //_CODE_:slider1:761024:
-  println("slider1 - GSlider >> GEvent." + event + " @ " + millis());  
-} //_CODE_:slider1:761024:
+synchronized public void win_draw1(PApplet appc, GWinData data) { //_CODE_:window1:901739:
+  appc.background(230);
+} //_CODE_:window1:901739:
 
-public void slider2_change1(GSlider source, GEvent event) { //_CODE_:slider2:552762:
-  println("slider2 - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:slider2:552762:
+public void panel1_Click1(GPanel source, GEvent event) { //_CODE_:panel1:342012:
+  println("panel2 - GPanel >> GEvent." + event + " @ " + millis());
+} //_CODE_:panel1:342012:
 
-public void checkbox1_clicked1(GCheckbox source, GEvent event) { //_CODE_:checkbox1:351527:
-  println("checkbox1 - GCheckbox >> GEvent." + event + " @ " + millis());
-} //_CODE_:checkbox1:351527:
-
-public void button1_click1(GButton source, GEvent event) { //_CODE_:button1:939497:
+public void addImageButton_click(GButton source, GEvent event) { //_CODE_:addImageButton:429372:
   println("button1 - GButton >> GEvent." + event + " @ " + millis());
-  player.pause();
-  //minim.stop();
-  noLoop();
-  //PSurface s = surface;
-  //s.placeWindow(,)
-  selectInput("Seleccione una imagen", "onSelectImage");
-} //_CODE_:button1:939497:
+  
+  selectInput("Select image file", "onImageFileSelected"); 
+} //_CODE_:addImageButton:429372:
 
-public void button2_click1(GButton source, GEvent event) { //_CODE_:button2:668892:
-  println("button2 - GButton >> GEvent." + event + " @ " + millis());
-  player.pause();
-  noLoop();
-  selectInput("Seleccione un archivo de audio", "fileSelected");
-} //_CODE_:button2:668892:
+public void imageScaleSldier_change(GSlider source, GEvent event) { //_CODE_:imageScaleSlider:344463:
+  println("slider1 - GSlider >> GEvent." + event + " @ " + millis());
+  float val = source.getValueF();
+  imageManager.setScale(val);
+} //_CODE_:imageScaleSlider:344463:
 
-public void slider2d1_change1(GSlider2D source, GEvent event) { //_CODE_:slider2d1:872828:
-  println("slider2d1 - GSlider2D >> GEvent." + event + " @ " + millis());
-} //_CODE_:slider2d1:872828:
+public void exitButton_click(GButton source, GEvent event) { //_CODE_:exitButton:885400:
+  println("exitButton - GButton >> GEvent." + event + " @ " + millis());
+  exitRequested = true;
+ 
+} //_CODE_:exitButton:885400:
 
 
 
@@ -56,69 +49,42 @@ public void createGUI(){
   G4P.setGlobalColorScheme(GCScheme.GREEN_SCHEME);
   G4P.setCursor(ARROW);
   surface.setTitle("Sketch Window");
-  label1 = new GLabel(this, 10, 10, 140, 20);
-  label1.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-  label1.setText("escala minima");
-  label1.setOpaque(false);
-  slider1 = new GSlider(this, 150, 10, 140, 20, 10.0);
-  slider1.setLimits(0.5, 0.0, 1.0);
-  slider1.setNumberFormat(G4P.DECIMAL, 2);
-  slider1.setOpaque(false);
-  slider1.addEventHandler(this, "slider1_change1");
-  label3 = new GLabel(this, 10, 40, 140, 20);
-  label3.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-  label3.setText("escala maxima");
-  label3.setLocalColorScheme(GCScheme.BLUE_SCHEME);
-  label3.setOpaque(false);
-  slider2 = new GSlider(this, 150, 40, 140, 20, 10.0);
-  slider2.setLimits(0.5, 0.0, 1.0);
-  slider2.setNumberFormat(G4P.DECIMAL, 2);
-  slider2.setLocalColorScheme(GCScheme.BLUE_SCHEME);
-  slider2.setOpaque(false);
-  slider2.addEventHandler(this, "slider2_change1");
-  label2 = new GLabel(this, 12, 72, 140, 20);
-  label2.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-  label2.setText("My label");
-  label2.setLocalColorScheme(GCScheme.BLUE_SCHEME);
-  label2.setOpaque(false);
-  checkbox1 = new GCheckbox(this, 156, 72, 140, 20);
-  checkbox1.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-  checkbox1.setText("checkbox text");
-  checkbox1.setLocalColorScheme(GCScheme.ORANGE_SCHEME);
-  checkbox1.setOpaque(false);
-  checkbox1.addEventHandler(this, "checkbox1_clicked1");
-  button1 = new GButton(this, 156, 108, 140, 24);
-  button1.setText("Open file ...");
-  button1.addEventHandler(this, "button1_click1");
-  button2 = new GButton(this, 156, 144, 140, 24);
-  button2.setText("Open file ...");
-  button2.addEventHandler(this, "button2_click1");
-  label5 = new GLabel(this, 10, 150, 140, 20);
-  label5.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-  label5.setText("Seleccionar archivo de audio");
-  label5.setOpaque(false);
-  label4 = new GLabel(this, 10, 110, 140, 20);
-  label4.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-  label4.setText("Seleccionar imagen");
-  label4.setOpaque(false);
-  slider2d1 = new GSlider2D(this, 156, 180, 132, 96);
-  slider2d1.setLimitsX(0.5, 0.0, 1.0);
-  slider2d1.setLimitsY(0.5, 0.0, 1.0);
-  slider2d1.setNumberFormat(G4P.DECIMAL, 2);
-  slider2d1.setOpaque(false);
-  slider2d1.addEventHandler(this, "slider2d1_change1");
+  window1 = GWindow.getWindow(this, "Properties", 0, 0, 300, 200, JAVA2D);
+  window1.noLoop();
+  window1.setActionOnClose(G4P.CLOSE_WINDOW);
+  window1.addDrawHandler(this, "win_draw1");
+  panel1 = new GPanel(window1, 10, 10, 280, 180, "Configuration");
+  panel1.setText("Configuration");
+  panel1.setTextBold();
+  panel1.setOpaque(true);
+  panel1.addEventHandler(this, "panel1_Click1");
+  addImageButton = new GButton(window1, 100, 40, 80, 30);
+  addImageButton.setText("Add image ...");
+  addImageButton.addEventHandler(this, "addImageButton_click");
+  imageScaleSlider = new GSlider(window1, 21, 82, 225, 50, 10.0);
+  imageScaleSlider.setShowValue(true);
+  imageScaleSlider.setShowLimits(true);
+  imageScaleSlider.setLimits(1.0, 0.0, 4.0);
+  imageScaleSlider.setNbrTicks(10);
+  imageScaleSlider.setStickToTicks(true);
+  imageScaleSlider.setShowTicks(true);
+  imageScaleSlider.setNumberFormat(G4P.DECIMAL, 2);
+  imageScaleSlider.setOpaque(false);
+  imageScaleSlider.addEventHandler(this, "imageScaleSldier_change");
+  exitButton = new GButton(window1, 20, 139, 80, 30);
+  exitButton.setText("Exit");
+  exitButton.setTextBold();
+  exitButton.addEventHandler(this, "exitButton_click");
+  panel1.addControl(addImageButton);
+  panel1.addControl(imageScaleSlider);
+  panel1.addControl(exitButton);
+  window1.loop();
 }
 
 // Variable declarations 
 // autogenerated do not edit
-GLabel label1; 
-GSlider slider1; 
-GLabel label3; 
-GSlider slider2; 
-GLabel label2; 
-GCheckbox checkbox1; 
-GButton button1; 
-GButton button2; 
-GLabel label5; 
-GLabel label4; 
-GSlider2D slider2d1; 
+GWindow window1;
+GPanel panel1; 
+GButton addImageButton; 
+GSlider imageScaleSlider; 
+GButton exitButton; 
