@@ -7,29 +7,40 @@ import ddf.minim.signals.*;
 import ddf.minim.spi.*;
 import ddf.minim.ugens.*;
 
+// need to import this so we can use Mixer and Mixer.Info objects
+import javax.sound.sampled.*;
+
 Minim minim;
 BeatDetect beat;
 AudioPlayer player;
+AudioInput in;
 ImageManager imageManager;
-
+Movie fire;
 boolean exitRequested;
 int imageScale; // 0 to 25
 int tintAlpha; // 0 to 10
-
+Mixer mixer;
 void setup() {
   //size(800, 600, P3D);
   //size(640, 480, P3D); 
-  size(400, 300, FX2D);
-  //fullScreen(FX2D);
+  size(400, 300, P3D);
+  //fullScreen(P2D);
   //images = new ArrayList();
   createGUI();
   exitRequested = false;
   PSurface s = surface;
   s.setResizable(true);
+ // s.setVisible(false);
   minim = new Minim(this);
   minim.debugOn();
-  noLoop();
-  selectInput("Select a song", "fileSelected");
+  //Mixer.Info mInfo = AudioSystem.getMixerInfo()[2];
+  //mixer = AudioSystem.getMixer(mInfo);
+  //minim.setInputMixer(mixer);
+  in = minim.getLineIn(Minim.MONO);
+  //minim.getLineIn().
+ // noLoop();
+  //fire.speed(4);
+  //selectInput("Select a song", "fileSelected");
   imageScale = 0;
   tintAlpha = 0;
   beat = new BeatDetect();
@@ -41,7 +52,7 @@ void setup() {
   imageManager = new ImageManager(this, "picture.jpg");
   println("imageManager loaded");
 
-  imageMode(CENTER);
+  //imageMode(CENTER);
 }
 
 void fileSelected(File f) {
@@ -54,9 +65,10 @@ void fileSelected(File f) {
     player = minim.loadFile(f.getAbsolutePath(), 1024);
     println("sound file loaded");
     loop();
+    surface.setVisible(true);
     //redraw();
     //vid = new Movie(this, "video.wmv");
-    player.play();
+    player.loop();
     //vid.loop();
     //beat.
   }
@@ -72,7 +84,8 @@ void draw() {
     exit();
   }
   background(0);
-  beat.detect(player.mix);
+  //beat.detect(player.mix);
+  beat.detect(in.mix);  
   //if (beat.isOnset()) {
   //  imageScale = 25;
   //} else if (imageScale > 0) {
@@ -104,12 +117,13 @@ void draw() {
   //  image(vid, 0, 0, vid.width, vid.height);
   //getSurface().set
   //image(image, 0, 0, width, height);
+  //  image(fire, 0,0,width, height);
   imageManager.draw();
-//  popMatrix();
+  //  popMatrix();
 }
 
 void redraw() {
-  println("running redraw");  
+  println("running redraw");
 }
 
 void onImageFileSelected(File f) {
@@ -119,6 +133,7 @@ void onImageFileSelected(File f) {
       println("Image was loaded successfully");
       //images.add(localImage);
       //printImagelist();
+      imageManager.addImage(localImage);
     } else {
       println("Unable to load {{" + f.getName() + "}} as an image");
     }

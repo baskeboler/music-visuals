@@ -40,6 +40,11 @@ public void exitButton_click(GButton source, GEvent event) { //_CODE_:exitButton
  
 } //_CODE_:exitButton:885400:
 
+public void fullscreenButton_click(GButton source, GEvent event) { //_CODE_:fullscreenButton:709525:
+  println("fullscreenButton - GButton >> GEvent." + event + " @ " + millis());
+  fullScreen();
+} //_CODE_:fullscreenButton:709525:
+
 
 
 // Create all the GUI controls. 
@@ -75,9 +80,14 @@ public void createGUI(){
   exitButton.setText("Exit");
   exitButton.setTextBold();
   exitButton.addEventHandler(this, "exitButton_click");
+  fullscreenButton = new GButton(window1, 110, 139, 80, 30);
+  fullscreenButton.setText("Full screen");
+  fullscreenButton.setTextItalic();
+  fullscreenButton.addEventHandler(this, "fullscreenButton_click");
   panel1.addControl(addImageButton);
   panel1.addControl(imageScaleSlider);
   panel1.addControl(exitButton);
+  panel1.addControl(fullscreenButton);
   window1.loop();
 }
 
@@ -88,3 +98,4 @@ GPanel panel1;
 GButton addImageButton; 
 GSlider imageScaleSlider; 
 GButton exitButton; 
+GButton fullscreenButton; 
