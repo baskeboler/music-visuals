@@ -8,37 +8,44 @@ import ddf.minim.spi.*;
 import ddf.minim.ugens.*;
 
 // need to import this so we can use Mixer and Mixer.Info objects
-import javax.sound.sampled.*;
+//import javax.sound.sampled.*;
 
 Minim minim;
 BeatDetect beat;
-AudioPlayer player;
+//AudioPlayer player;
 AudioInput in;
 ImageManager imageManager;
-Movie fire;
+
 boolean exitRequested;
 int imageScale; // 0 to 25
 int tintAlpha; // 0 to 10
-Mixer mixer;
+//Mixer mixer;
+int mode = 0;
+
 void setup() {
   //size(800, 600, P3D);
-  //size(640, 480, P3D); 
-  size(400, 300, P3D);
-  //fullScreen(P2D);
+  size(640, 480, P3D); 
+  //size(300, 200, P3D);
+  //  frameRate(40);
+
+  //  fullScreen(P3D);
   //images = new ArrayList();
-  createGUI();
+  //createGUI();
+  //configWindow.setVisible(false);
   exitRequested = false;
-  PSurface s = surface;
-  s.setResizable(true);
- // s.setVisible(false);
+  //PSurface s = surface;
+  surface.setResizable(true);
+  // s.setVisible(false);
   minim = new Minim(this);
   minim.debugOn();
+
   //Mixer.Info mInfo = AudioSystem.getMixerInfo()[2];
   //mixer = AudioSystem.getMixer(mInfo);
   //minim.setInputMixer(mixer);
   in = minim.getLineIn(Minim.MONO);
+  //minim.getLineOut().close();
   //minim.getLineIn().
- // noLoop();
+  // noLoop();
   //fire.speed(4);
   //selectInput("Select a song", "fileSelected");
   imageScale = 0;
@@ -55,35 +62,37 @@ void setup() {
   //imageMode(CENTER);
 }
 
-void fileSelected(File f) {
-  if (f == null) {
-    println("user cancelled");
-  } else {
-    if (player != null && player.isPlaying()) {
-      player.close();
-    }
-    player = minim.loadFile(f.getAbsolutePath(), 1024);
-    println("sound file loaded");
-    loop();
-    surface.setVisible(true);
-    //redraw();
-    //vid = new Movie(this, "video.wmv");
-    player.loop();
-    //vid.loop();
-    //beat.
-  }
-}
+//void fileSelected(File f) {
+//  if (f == null) {
+//    println("user cancelled");
+//  } else {
+//    if (player != null && player.isPlaying()) {
+//      player.close();
+//    }
+//    player = minim.loadFile(f.getAbsolutePath(), 1024);
+//    println("sound file loaded");
+//    loop();
+//    surface.setVisible(true);
+//    //redraw();
+//    //vid = new Movie(this, "video.wmv");
+//    player.loop();
+//    //vid.loop();
+//    //beat.
+//  }
+//}
 
 void draw() {
-  if (player == null) return;
+  //if (player == null) return;
   if (exitRequested) {
-
-    player.close();
+    configWindow.dispose();
+    //player.close();
+    imageManager.dispose();
+    configWindow.close();
     minim.stop();
     minim.dispose();
-    exit();
+   // exit();
   }
-  background(0);
+//  background(0);
   //beat.detect(player.mix);
   beat.detect(in.mix);  
   //if (beat.isOnset()) {
@@ -99,32 +108,9 @@ void draw() {
   if (beat.isOnset()) {
     imageManager.beat();
   }
-  //float scale = map(imageScale, 0, 25, 1, 1.5f);
-  //int alpha = (int)map(tintAlpha, 0, 10, 0, 255); 
-  //pushMatrix();
-  //float a = map(
-  //if (tintAlpha > 0) {
-  //  tint( 255, 0, 0, alpha);
-  //} else {
-  //  noTint();
-  //}
-  //translate(width/2, height/2);
-  //scale(scale);
-  //if (vid!= null && vid.available()) {
-  //  vid.read();
-  //}
-  //if (vid!=null && vid.isLoaded())
-  //  image(vid, 0, 0, vid.width, vid.height);
-  //getSurface().set
-  //image(image, 0, 0, width, height);
-  //  image(fire, 0,0,width, height);
   imageManager.draw();
-  //  popMatrix();
 }
 
-void redraw() {
-  println("running redraw");
-}
 
 void onImageFileSelected(File f) {
   if (f != null) {
@@ -145,8 +131,17 @@ void onImageFileSelected(File f) {
 
 
 void keyPressed() {
-  if (key == ESC) {
+  switch (key) {
+  case ESC:
     println("ESC key pressed!");
     exitRequested = true;
+    break;
+
+  case ENTER:
+    //mode = (mode+1)%2;
+    imageManager.modeTransition();
+    break;
+  default:
+    break;
   }
 }

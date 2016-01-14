@@ -1,36 +1,32 @@
 public class ImageManager { //<>// //<>//
   private ArrayList<PImage> images = new ArrayList();
-  private int updateInterval = 1;
-  private int transitionInterval = 60;
-  private Movie fire;
+  private int updateInterval = 50;
+  private int transitionInterval = 10;
   private PImage mainImage;
   private PImage altImage;
   private PImage renderImage;
   private PApplet parent;
   private int lastTransitionTimestamp;
   private int lastUpdateTimestamp;
-  private PMatrix2D matrix;
+  // private PMatrix2D matrix;
   private float scale;
   private PVector pos;
-  private boolean matrixChanged;
-  private PImage alphaMask;
-  private boolean enableAlphaMask;
+  VideoEffect fireEffect;
+  AudioWaveEffect waveEffect;
   int beat = 0;
 
   public ImageManager(PApplet parent, String imagePath) {
     this.parent = parent;
     println("Creating imagemanager");
 
-    this.fire = new Movie(parent, "fire.mp4");
-    this.fire.loop();
-    this.fire.volume(0);
+    // this.fire.speed(3);
     this.mainImage = parent.loadImage(imagePath);
     println("main image loaded");
-    this.renderImage = this.mainImage.copy();
+    this.renderImage = this.mainImage;
     println("render image created");
     //parent.applyMatrix(
-    this.matrix = new PMatrix2D();
-    this.matrix.reset();
+    // this.matrix = new PMatrix2D();
+    //this.matrix.reset();
     println("imagemanager matrix initialized");
     this.init();
   }
@@ -41,10 +37,12 @@ public class ImageManager { //<>// //<>//
     this.lastUpdateTimestamp = millis();
     this.scale = 1f;
     this.pos = new PVector(parent.width/2, parent.height/2);
-    alphaMask = loadImage("alphamask.png");
+    altImage = loadImage("picture.png");
     //alphaMask.filter(GRAY);
-    alphaMask.resize(renderImage.width, renderImage.height);
+    //alphaMask.resize(renderImage.width, renderImage.height);
     //renderImage.mask(alphaMask);
+    fireEffect = new VideoEffect(this, "fire.mp4");
+    waveEffect = new AudioWaveEffect(this);
     println("alpha mask loaded and resized");
   }
 
@@ -52,25 +50,25 @@ public class ImageManager { //<>// //<>//
     int now = millis();
     if (now - this.lastUpdateTimestamp > this.updateInterval) {
       // update code
-      this.setScale(map(beat, 0, 100, 1, 3));
+      this.setScale(map(beat, 0, 100, 1, 1.5));
       this.setPos(parent.width/2, parent.height/2);
       this.lastUpdateTimestamp = now;
-      if (this.matrixChanged) {
-        updateMatrix();
-      }
-      if (fire.available()) {
-       fire.read(); 
-      }
+
+      //if (fire.available()) {
+      //  fire.read();
+      //}
       //renderImage.
+    }
+    now = second();
+    if (now - this.lastTransitionTimestamp > this.transitionInterval) {
+      println("transition trigger");
+      modeTransition();
+      this.lastTransitionTimestamp = now;
     }
   }
 
-  private void updateMatrix() {
-    //    println("updating imagemanager matrix");
-    this.matrix.reset();
-    this.matrix.translate(this.pos.x, this.pos.y);
-    this.matrix.scale(this.scale);
-    this.matrixChanged = false;
+  public void modeTransition() {
+    mode = (mode+1) % 3;
   }
 
   private void printImagelist() {
@@ -85,17 +83,28 @@ public class ImageManager { //<>// //<>//
     this.pos.x = x;
     this.pos.y = y;
     this.pos.z = 0;
-    matrixChanged = true;
   }
 
   public void setScale(float x) {
     this.scale = x;
-    matrixChanged = true;
   }
 
   public void draw() {
     this.update();
-    fireMode(); 
+    switch (mode) {
+    case 0:
+      fireMode(); 
+      break;
+    case 1:
+      imageBumpMode();
+      break;
+    case 2:
+      waveMode();
+      break;
+    default:
+      //fireMode();
+      break;
+    }
     updateBeat();
   }
 
@@ -103,7 +112,8 @@ public class ImageManager { //<>// //<>//
     int picAlpha = int(map(beat, 0, 100, 0, 255));
 
     parent.pushMatrix();
-    parent.applyMatrix(this.matrix);
+    translate(this.pos.x, this.pos.y);
+    scale(this.scale);
     parent.imageMode(CENTER);
     tint(255, 255);
 
@@ -115,21 +125,20 @@ public class ImageManager { //<>// //<>//
     translate(parent.width/2, parent.height/2);
     blendMode(BLEND);
     tint(255, 0, 0, picAlpha);
-    image(alphaMask, 0, 0, parent.width, parent.height);
+    image(altImage, 0, 0, parent.width, parent.height);
     popMatrix();
   }
 
   public void fireMode() {
-    int picAlpha = int(map(beat, 0, 100, 0, 255));
-    tint(255, 255);
-    image(fire, 0, 0, parent.width, parent.height);
-    blendMode(BLEND);
-    tint(255, 0, 0, picAlpha);
-    image(alphaMask, 0, 0, parent.width, parent.height);
+    fireEffect.draw();
   }
 
+  public void waveMode() {
+    waveEffect.draw();
+  }
   public void dispose() {
     println("running imagemanager dispose");
+    fireEffect.dispose();
     this.images.clear(); 
     this.renderImage = null;
   }
@@ -145,10 +154,17 @@ public class ImageManager { //<>// //<>//
   public void addImage(PImage im) {
     this.images.add(im);
     im.resize(renderImage.width, renderImage.height);
-    alphaMask = im;
+    altImage = im;
   }
 
-  public void movieEvent(Movie m) {
-    m.read();
+  //public void movieEvent(Movie m) {
+  //  m.read();
+  //}
+  public PApplet getParent() {
+    return this.parent;
+  }
+
+  public float getScale() {
+    return this.scale;
   }
 }
