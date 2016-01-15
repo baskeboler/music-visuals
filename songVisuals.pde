@@ -7,28 +7,23 @@ import ddf.minim.signals.*;
 import ddf.minim.spi.*;
 import ddf.minim.ugens.*;
 
-// need to import this so we can use Mixer and Mixer.Info objects
-//import javax.sound.sampled.*;
 
 Minim minim;
 BeatDetect beat;
-//AudioPlayer player;
 AudioInput in;
 ImageManager imageManager;
+Ticker ticker;
 
 boolean exitRequested;
-int imageScale; // 0 to 25
-int tintAlpha; // 0 to 10
-//Mixer mixer;
-int mode = 0;
 
 void setup() {
   //size(800, 600, P3D);
-  size(640, 480, P3D); 
-  //size(300, 200, P3D);
+  //size(640, 480, FX2D); 
+  size(300, 200, P3D);
   //  frameRate(40);
 
   //  fullScreen(P3D);
+background(0);
   //images = new ArrayList();
   //createGUI();
   //configWindow.setVisible(false);
@@ -48,18 +43,18 @@ void setup() {
   // noLoop();
   //fire.speed(4);
   //selectInput("Select a song", "fileSelected");
-  imageScale = 0;
-  tintAlpha = 0;
   beat = new BeatDetect();
   // beat.setSensitivity(200);
   beat.detectMode(BeatDetect.SOUND_ENERGY);
+//  AudioBuffer 
   //image = loadImage("picture.jpg");
   //images.add(image);
   //vid.loop();
   imageManager = new ImageManager(this, "picture.jpg");
   println("imageManager loaded");
-
+  ticker = new Ticker(this, "PIZZA - $200 .... EMPANADAS - $45 .... CERVEZA - $120 .... SEXO ORAL - $500");
   //imageMode(CENTER);
+  smooth();
 }
 
 //void fileSelected(File f) {
@@ -95,38 +90,15 @@ void draw() {
 //  background(0);
   //beat.detect(player.mix);
   beat.detect(in.mix);  
-  //if (beat.isOnset()) {
-  //  imageScale = 25;
-  //} else if (imageScale > 0) {
-  //  imageScale--;
-  //}
-  //if (beat.isOnset()) {
-  //  tintAlpha = 10;
-  //} else if (tintAlpha > 0) {
-  //  tintAlpha--;
-  //}
   if (beat.isOnset()) {
     imageManager.beat();
   }
+  pushStyle();
   imageManager.draw();
+  popStyle();
+  ticker.draw();
 }
 
-
-void onImageFileSelected(File f) {
-  if (f != null) {
-    PImage localImage = loadImage(f.getAbsolutePath());
-    if (localImage != null) {
-      println("Image was loaded successfully");
-      //images.add(localImage);
-      //printImagelist();
-      imageManager.addImage(localImage);
-    } else {
-      println("Unable to load {{" + f.getName() + "}} as an image");
-    }
-  } else {
-    println("Error leyendo la imagen");
-  }
-}
 
 
 

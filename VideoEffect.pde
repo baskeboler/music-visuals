@@ -3,7 +3,7 @@ class VideoEffect implements Effect {
   private Movie movie;
   private PImage bumperImage;
   private float rotate = 0;
-  
+
   public VideoEffect(final ImageManager parent, String videoPath) {
     this.parent = parent;
     movie = new Movie(parent.getParent(), videoPath);
@@ -13,19 +13,25 @@ class VideoEffect implements Effect {
     bumperImage = parent.altImage;
     PApplet.println("VideoEffect loaded with " + videoPath);
   }
-  
-  void dispose() {
-   movie.dispose(); 
+  String toString() {
+    return "VideoEffect-"+movie.toString();
   }
-  
+  void dispose() {
+    movie.stop();
+    movie = null;
+    //movie.dispose();
+    
+  }
+
   void activate() {
     movie.loop();
   }
-  
+
   void deactivate() {
     movie.pause();
+    System.gc();
   }
-  
+
   void draw() {
     final PApplet app = parent.getParent();
     app.imageMode(PConstants.CENTER);
@@ -33,9 +39,9 @@ class VideoEffect implements Effect {
     app.translate(app.width / 2, app.height / 2);
     final int picAlpha = (int) PApplet.map(parent.beat, 0, 100, 0, 128);
     app.tint(255, 255);
-    if (movie.available()) {
-      movie.read();
-    }
+    //if (movie.available()) {
+    // movie.read();
+    //}
     app.image(movie, 0, 0, app.width, app.height);
     app.scale(parent.getScale());
     app.blendMode(PConstants.BLEND);
@@ -44,4 +50,9 @@ class VideoEffect implements Effect {
     app.image(bumperImage, 0, 0); // , parent.width, parent.height);
     app.popMatrix();
   }
+}
+
+public void movieEvent(Movie m) {
+  m.read();
+  // println("movie event!");
 }
